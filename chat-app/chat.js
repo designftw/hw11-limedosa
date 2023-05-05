@@ -167,10 +167,12 @@ const app = {
   },
 
   methods: {
+    
     async sendMessage() {
       const message = {
         type: "Note",
         content: this.messageText,
+        
       };
 
       // The context field declares which
@@ -218,12 +220,13 @@ const app = {
     // Problem 1 solution
     async setUsername() {
       try {
-        this.usernameResult = await this.resolver.requestUsername(
-          this.preferredUsername
-        );
+        const result = await axios.post('/api/set-username', {
+          username: this.preferredUsername
+        });
+        this.usernameResult = result.data;
         this.myUsername = this.preferredUsername;
       } catch (e) {
-        this.usernameResult = e.toString();
+        this.usernameResult = e.toString();    
       }
     },
     /////////////////////////////
@@ -240,13 +243,13 @@ const app = {
       } catch (e) {
         console.error(e);
       }
-    }
+    },
   
-    // /////////////////////////////
-    // onImageAttachment(event) {
-    //   const file = event.target.files[0];
-    //   this.file = file;
-    // },
+    /////////////////////////////
+    onImageAttachment(event) {
+      const file = event.target.files[0];
+      this.file = file;
+    },
   },
 };
 
@@ -399,6 +402,27 @@ const ProfilePicture = {
 
   template: "#pfp",
 };
+const saveProfilePicture = async () => {
+  if (!file.value) {
+    return;
+  }
+  const formData = new FormData();
+  formData.append("file", file.value);
+  const response = await $gf.postImage(formData);
+  const newImageObject = {
+    type: "Image",
+    name: file.value.name,
+    url: response.url,
+  };
+  const profileObject = profile.value || { type: "Profile" };
+  profileObject.image = newImageObject;
+  await $gf.post(profileObject);
+  file.value = null;
+  imageUrl.value = response.url;
+  editing.value = false;
+  await $gf.post(profileObject); // add this line to update the object in the database
+};
+
 
 const Like = {
   props: ["messageid"],
@@ -488,5 +512,5 @@ const Read = {
 };
 
 
-app.components = { Name, Like, ProfilePicture, Read };
+app.components = { Name, Like, ProfilePicture, Read, saveProfilePicture };
 Vue.createApp(app).use(GraffitiPlugin(Vue)).mount("#app");

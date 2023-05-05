@@ -61,6 +61,8 @@
     </template>
 
     <!-- UPDATES -->
+    <!-- UPDATES -->
+    <!-- UPDATES -->
     <template v-if="pick==='nav-updates'">
 
       <h2 class="nav-heading">Updates</h2>
@@ -73,8 +75,8 @@
 
 
       <!-- <label for="site-search"></label>
-      <input type="search" id="site-search" name="q" v-model="searchQuery">
-      <button>Search</button> -->
+        <input type="search" id="site-search" name="q" v-model="searchQuery">
+        <button>Search</button> -->
 
       <h3>Send Message</h3>
       <form @submit.prevent="sendMessage">
@@ -155,7 +157,6 @@
 
     </template>
     </template>
-
     <!-- SEARCH -->
     <template v-if="pick==='nav-search'">
       <h2 class="nav-heading">Search</h2>
@@ -180,16 +181,29 @@
       </form>
       {{ usernameResult }}
       </p>
-      <!-- End Problem 1 Solution -->
-      <h3>Name: {{name}}</h3>
-      {{usernamResult}}
-      <p>
-        <!-- {{name}} -->
-        <name :actor="$gf.me" :editable="true"></name>
 
-      </p>
+      <!-- Profile Picture -->
+      <div>
+        <h3>Profile Picture:</h3>
+        <div v-if="!editProfilePicture">
+          <img v-if="imageUrl" :src="imageUrl" alt="Profile picture" />
+          <div v-else>No profile picture uploaded.</div>
+          <button @click="editProfilePicture">Edit</button>
+        </div>
+
+        <div v-else>
+          <input type="file" @change="handleFileUpload" />
+          <img v-if="imageUrl" :src="imageUrl" alt="Preview" />
+          <button @click="saveProfilePicture">Save</button>
+          <button @click="editProfilePicture">Cancel</button>
+        </div>
+      </div>
+
+      <!-- Name -->
+      <h3>Name: {{name}}</h3>
+      <name :actor="$gf.me" :editable="true"></name>
+
       <h1>{{myUsername}}</h1>
-      <h3>Profile Picture:</h3>
     </template>
 
 
@@ -275,31 +289,47 @@
   </template>
 
   <template id="read">
-    <button @click="toggleRead" style="font-size: 10px; float: center-top; background-color:rgba(22, 103, 53, 0.287); color:blue">
+    <button @click="toggleRead"
+      style="font-size: 10px; float: center-top; background-color:rgba(22, 103, 53, 0.287); color:blue">
       {{ myReads.length? 'Mark Un-read' : 'Mark Read' }}
     </button>
     {{ numReads }} Read
   </template>
 
-
-
   <template id="pfp">
-    <div>
-      <h3>Profile Picture</h3>
-      <div v-if="!editing">
-        <img v-if="imageUrl" :src="imageUrl" alt="Profile Picture" style="max-width: 200px; max-height: 200px;">
-        <button v-if="editable" @click="editProfilePicture">Edit</button>
+    <div class="profile-picture-container">
+      <div class="profile-picture" v-if="imageUrl">
+        <img :src="imageUrl" />
       </div>
-      <div v-else>
-        <img :src="imageUrl" alt="Profile Picture" style="max-width: 200px; max-height: 200px;">
-        <input type="file" accept="image/*" @change="handleFileUpload">
-        <button @click="saveProfilePicture">Save</button>
-        <button @click="editing = false">Cancel</button>
-        <profile-picture :actor="actor" :editable="true"></profile-picture>
-
+      <div class="profile-picture" v-else>
+        <div class="no-profile-picture"></div>
+      </div>
+      <div class="profile-picture-actions" v-if="editable">
+        <div class="file-input-container">
+          <input type="file" @change="handleFileUpload" />
+          <button class="file-input-button">
+            <i class="fas fa-camera"></i>
+            <span>Upload Photo</span>
+          </button>
+        </div>
+        <div class="profile-picture-buttons">
+          <button class="edit-button" v-if="!editing" @click="editProfilePicture">
+            <i class="fas fa-edit"></i>
+            <span>Edit</span>
+          </button>
+          <button class="save-button" v-if="editing" @click="saveProfilePicture">
+            <i class="fas fa-check"></i>
+            <span>Save</span>
+          </button>
+          <button class="cancel-button" v-if="editing" @click="editing = false">
+            <i class="fas fa-times"></i>
+            <span>Cancel</span>
+          </button>
+        </div>
       </div>
     </div>
   </template>
+
 
 
 
