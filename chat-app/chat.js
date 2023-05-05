@@ -17,26 +17,27 @@ const app = {
     const channel = Vue.ref("default");
 
     // And a flag for whether or not we're private-messaging
-    const privateMessaging = Vue.ref(false);
+    const pick = Vue.ref("nav-updates");
 
     // If we're private messaging use "me" as the channel,
     // otherwise use the channel value
     const $gf = Vue.inject("graffiti");
-    const context = Vue.computed(() =>
-      privateMessaging.value ? [$gf.me] : [channel.value]
-    );
+    const context = Vue.computed(() => {
+      if (pick.value == "nav-private") {
+        return [$gf.me];
+      } else {
+        return [channel.value];
+      }
+    });
 
     // Initialize the collection of messages associated with the context
     const { objects: messagesRaw } = $gf.useObjects(context);
-    return { channel, privateMessaging, messagesRaw };
+    return { channel, pick, messagesRaw };
   },
 
   data() {
     // Initialize some more reactive variables
     return {
-      person: {},
-      searchQuery: "",
-      pick: "nav-updates",
       messageText: "",
       editID: "",
       editText: "",
@@ -53,13 +54,19 @@ const app = {
       //////////////////////////////
       //////////////////////////////
       // Problem 3 solution
-      // Problem 3 solution
       myUsername: "",
       actorsToUsernames: {},
       /////////////////////////////
       imageDownloads: {},
+      person: {},
+      searchQuery: "",
+      pick: "nav-updates",
+      replies: {},
     };
   },
+
+  //////////////////////////////
+  // Problem 3 solution
   watch: {
     "$gf.me": async function (me) {
       this.myUsername = await this.resolver.actorToUsername(me);
@@ -95,63 +102,7 @@ const app = {
       }
     },
   },
-  // watch: {
-  //   "$gf.me": async function (me) {
-  //     this.myUsername = await this.resolver.actorToUsername(me);
-  //   },
-
-  //   async messages(messages) {
-  //     for (const m of messages) {
-  //       if (!(m.actor in this.actorsToUsernames)) {
-  //         this.actorsToUsernames[m.actor] = await this.resolver.actorToUsername(
-  //           m.actor
-  //         );
-  //       }
-  //       if (m.bto && m.bto.length && !(m.bto[0] in this.actorsToUsernames)) {
-  //         this.actorsToUsernames[m.bto[0]] =
-  //           await this.resolver.actorToUsername(m.bto[0]);
-  //       }
-  //     }
-  //   },
-  //   async messagesWithAttachments(messages) {
-  //     for (const m of messages) {
-  //       if (!(m.attachment.magnet in this.imageDownloads)) {
-  //         this.imageDownloads[m.attachment.magnet] = "downloading";
-  //         let blob;
-  //         try {
-  //           blob = await this.$gf.media.fetch(m.attachment.magnet);
-  //         } catch (e) {
-  //           this.imageDownloads[m.attachment.magnet] = "error";
-  //           continue;
-  //         }
-  //         this.imageDownloads[m.attachment.magnet] = URL.createObjectURL(blob);
-  //       }
-  //     }
-  //   },
-  // },
-
-  //////////////////////////////
-  // Problem 3 solution
-  watch: {
-    "$gf.me": async function (me) {
-      this.myUsername = await this.resolver.actorToUsername(me);
-    },
-
-    async messages(messages) {
-      for (const m of messages) {
-        if (!(m.actor in this.actorsToUsernames)) {
-          this.actorsToUsernames[m.actor] = await this.resolver.actorToUsername(
-            m.actor
-          );
-        }
-        if (m.bto && m.bto.length && !(m.bto[0] in this.actorsToUsernames)) {
-          this.actorsToUsernames[m.bto[0]] =
-            await this.resolver.actorToUsername(m.bto[0]);
-        }
-      }
-    },
-  },
-  /////////////////////////////
+  /////////
 
   computed: {
     messages() {
@@ -172,7 +123,7 @@ const app = {
         );
 
       // Do some more filtering for private messaging
-      if (this.privateMessaging) {
+      if (this.pick === "nav-private") {
         messages = messages.filter(
           (m) =>
             // Is the message private?
@@ -202,7 +153,15 @@ const app = {
           // most recently created ones first
           .sort((m1, m2) => new Date(m2.published) - new Date(m1.published))
           // Only show the 10 most recent ones
-          .slice(0, 10)
+          .slice(0, 50)
+      );
+    },
+    messagesWithAttachments() {
+      return this.messages.filter(
+        (m) =>
+          m.attachment &&
+          m.attachment.type == "Image" &&
+          typeof m.attachment.magnet == "string"
       );
     },
   },
@@ -225,7 +184,7 @@ const app = {
         };
         this.file = null;
       }
-      if (this.privateMessaging) {
+      if (this.pick === "nav-private") {
         message.bto = [this.recipient];
         message.context = [this.$gf.me, this.recipient];
       } else {
@@ -272,16 +231,22 @@ const app = {
     /////////////////////////////
     // Problem 2 solution
     async chatWithUser() {
-      this.recipient = await this.resolver.usernameToActor(
-        this.recipientUsernameSearch
-      );
-      this.recipientUsername = this.recipientUsernameSearch;
-    },
-    /////////////////////////////
-    onImageAttachment(event) {
-      const file = event.target.files[0];
-      this.file = file;
-    },
+      try {
+        const result = await axios.post('/api/username-to-actor', {
+          username: this.recipientUsernameSearch
+        });
+        this.recipient = result.data;
+        this.recipientUsername = this.recipientUsernameSearch;
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  
+    // /////////////////////////////
+    // onImageAttachment(event) {
+    //   const file = event.target.files[0];
+    //   this.file = file;
+    // },
   },
 };
 
@@ -357,6 +322,84 @@ const Name = {
 
   template: "#name",
 };
+////////////////////profile/
+const ProfilePicture = {
+  props: ["actor", "editable"],
+
+  setup(props) {
+    // Get a collection of all objects associated with the actor
+    const { actor } = Vue.toRefs(props);
+    const $gf = Vue.inject("graffiti");
+
+    // Reactive variable to store the image file
+    const file = Vue.ref(null);
+
+    // Reactive variable to store the image URL
+    const imageUrl = Vue.ref(null);
+
+    // Load the profile picture if it exists
+    const profile = Vue.computed(() => {
+      const objects = $gf.useObjects([actor]).value;
+      const profileObject = objects.find(
+        (obj) =>
+          obj.type === "Profile" && obj.image && typeof obj.image === "string"
+      );
+      if (profileObject) {
+        imageUrl.value = profileObject.image;
+      }
+      return profileObject;
+    });
+
+    // Handle file upload and update the image URL
+    const handleFileUpload = (event) => {
+      file.value = event.target.files[0];
+      imageUrl.value = URL.createObjectURL(file.value);
+    };
+
+    // Save the profile picture
+    const saveProfilePicture = async () => {
+      if (!file.value) {
+        return;
+      }
+      const formData = new FormData();
+      formData.append("file", file.value);
+      const response = await $gf.postImage(formData);
+      const newImageObject = {
+        type: "Image",
+        name: file.value.name,
+        url: response.url,
+      };
+      const profileObject = profile.value || { type: "Profile" };
+      profileObject.image = newImageObject;
+      await $gf.post(profileObject);
+      file.value = null;
+      imageUrl.value = response.url;
+      editing.value = false;
+    };
+
+    // Reactive variable to store the editing state
+    const editing = Vue.ref(false);
+
+    // Enter the editing state and reset the image file
+    const editProfilePicture = () => {
+      editing.value = true;
+      file.value = null;
+    };
+
+    return {
+      file,
+      imageUrl,
+      profile,
+      editing,
+      handleFileUpload,
+      saveProfilePicture,
+      editProfilePicture,
+    };
+  },
+
+  template: "#pfp",
+};
+
 const Like = {
   props: ["messageid"],
 
@@ -400,6 +443,50 @@ const Like = {
 
   template: "#like",
 };
+const Read = {
+  props: ["messageid"],
 
-app.components = { Name, Like };
+  setup(props) {
+    const $gf = Vue.inject("graffiti");
+    const messageid = Vue.toRef(props, "messageid");
+    const { objects: readsRaw } = $gf.useObjects([messageid]);
+    return { readsRaw };
+  },
+
+  computed: {
+    reads() {
+      return this.readsRaw.filter(
+        (l) => l.type == "Read" && l.object == this.messageid
+      );
+    },
+
+    numReads() {
+      // Unique number of actors
+      return [...new Set(this.reads.map((l) => l.actor))].length;
+    },
+
+    myReads() {
+      return this.reads.filter((l) => l.actor == this.$gf.me);
+    },
+  },
+
+  methods: {
+    toggleRead() {
+      if (this.myReads.length) {
+        this.$gf.remove(...this.myReads);
+      } else {
+        this.$gf.post({
+          type: "Read",
+          object: this.messageid,
+          context: [this.messageid],
+        });
+      }
+    },
+  },
+
+  template: "#read",
+};
+
+
+app.components = { Name, Like, ProfilePicture, Read };
 Vue.createApp(app).use(GraffitiPlugin(Vue)).mount("#app");

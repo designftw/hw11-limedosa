@@ -101,6 +101,16 @@ form input[type="text"] {
 }
 
 form input[type="submit"] {
+  border: none;
+  color: white;
+  padding: 7px 14px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 14px;
+  margin: 4px 2px;
+  transition: 400ms;
+  cursor: pointer;
   background-color: #0088cc;
   color: #fff;
   padding: 0.5rem 1rem;
@@ -114,6 +124,15 @@ form input[type="submit"] {
 
 form input[type="submit"]:hover {
   background-color: #000599;
+  border: none;
+  color: white;
+  padding: 7px 14px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  transform: scale(1.09);
+  transition: 400ms;
+  cursor: pointer;
 }
 button.editable {
   background-color: #00c083b7;
@@ -127,6 +146,7 @@ button.editable {
   display: inline-block;
   margin-top: 10px;
   cursor: pointer;
+  transition: 300ms;
 }
 
 button.editable:hover {
@@ -164,6 +184,7 @@ button.editable:hover {
   display: inline-block;
   font-size: 14px;
   margin: 4px 2px;
+  transition: 400ms;
   cursor: pointer;
 }
 
@@ -234,6 +255,11 @@ label:hover {
 input[type="radio"]:checked + label {
   color: #fff;
   background-color: #005a92b7;
+}
+@keyframes jump {
+  to {
+    transform: translateY(-0.4em);
+  }
 }
 
 .login-button:hover {
@@ -346,7 +372,17 @@ h1 {
 
 /* Style for the login button */
 button {
-  background-color: #0080ff;
+  border: none;
+  color: white;
+  padding: 7px 14px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 14px;
+  margin: 4px 2px;
+  transition: 400ms;
+  cursor: pointer;
+  background-color: #0b853a;
   border: none;
   color: #fff;
   font-size: 16px;
@@ -359,6 +395,7 @@ button {
 
 button:hover {
   background-color: #449100;
+  transform: scale(1.09);
 }
 
 /* Style for the chat format radio buttons */
@@ -442,6 +479,7 @@ label {
   overflow: hidden;
   transition: width 0.5s ease;
   cursor: pointer;
+  transition: 500ms;
 }
 
 .search:hover,
@@ -507,6 +545,7 @@ li button {
   border-radius: 4px;
   padding: 5px 10px;
   cursor: pointer;
+  transition: 300ms;
 }
 
 li:hover .popup-id {
