@@ -6,8 +6,8 @@ body {
 
 /* Outline style for all elements */
 /* * {
-  outline: 1px solid #1f874c;
-} */
+    outline: 1px solid #1f874c;
+  } */
 
 /* Animation for the background gradient */
 @keyframes background-animation {
@@ -21,6 +21,16 @@ body {
     background: linear-gradient(to right, #7ed95784, #85de7780);
   }
 }
+.message-pfp img {
+    width: 40%;
+    height: 40%;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 5px solid rgb(69, 147, 90);
+  }
+  
+
+  
 
 .message-actor {
   font-size: 19px !important;
@@ -355,7 +365,7 @@ h2 {
 }
 h1 {
   /* font-family: "Lobster", Arial, sans-serif;
-   */
+     */
   font-family: "Sigmar One", Impact, "Arial Narrow Bold";
   text-transform: uppercase;
   font-size: 300% !important;

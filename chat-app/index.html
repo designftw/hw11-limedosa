@@ -64,21 +64,32 @@
     <!-- UPDATES -->
     <!-- UPDATES -->
     <template v-if="pick==='nav-updates'">
-
       <h2 class="nav-heading">Updates</h2>
 
+      <!-- Begin chat interface -->
+      <div class="chat-interface">
+        <div class="chat-header">
+          <h3>Chat</h3>
+          <button @click="toggleChat">X</button>
+        </div>
+        <div class="chat-messages" ref="chatMessages">
+          <div class="message" v-for="message in messages" :key="message.id">
+            <span class="message-username">{{ actorsToUsernames[message.actor] }}:</span>
+            <span class="message-content">{{ message.content }}</span>
+          </div>
+        </div>
+        <div class="chat-input">
+          <input type="text" v-model="chatInput" @keyup.enter="sendMessage" placeholder="Type a message...">
+          <button @click="sendMessage">Send</button>
+        </div>
+      </div>
+      <!-- End chat interface -->
 
       <form class="search">
         <input type="text" placeholder="🔎" class="search__input" v-model="searchQuery">
         <button type="button" class="search__btn"><i class="ri-search-2-line"></i></button>
       </form>
 
-
-      <!-- <label for="site-search"></label>
-        <input type="search" id="site-search" name="q" v-model="searchQuery">
-        <button>Search</button> -->
-
-      <h3>Send Message</h3>
       <form @submit.prevent="sendMessage">
         <input v-model="messageText" placeholder="Type a message..." />
         <input type="file" accept="image/*" @change="onImageAttachment" />
@@ -115,6 +126,9 @@
             <li class="message-actorid">
               {{ message.actor }}
             </li>
+            <li v-if="message.attachment && message.attachment.magnet">
+              <magnet-img :src="message.attachment.magnet"></magnet-img>
+            </li>
             <!-- <li>&#128153</li> -->
 
             <li class="message-date">
@@ -135,28 +149,19 @@
                   Delete Message
                 </button>
               </li>
-              <li class="edit-delete-button">
-                <button @click="startEditMessage(message)">
+              <li>
+
+                class="edit-delete-button">
+                <button @click="editMessage(message)">
                   Edit Message
                 </button>
               </li>
             </template>
-            <li>
-              <like :messageid="message.id"></like>
-            </li>
-
-            <li>
-              <!-- This is a unique identifier that can be used to "link" to messages -->
-              <a href="#message-{{ message.id }}">Message ID: </a>
-              <div class="popup-id" id="message-{{ message.id }}">
-                {{ message.id }} </div>
-            </li>
           </ul>
         </li>
       </ul>
+    </template>
 
-    </template>
-    </template>
     <!-- SEARCH -->
     <template v-if="pick==='nav-search'">
       <h2 class="nav-heading">Search</h2>
@@ -295,8 +300,37 @@
     </button>
     {{ numReads }} Read
   </template>
+  <template id="read-receipts">
+    Read By:
+    <span v-for="actor in readActors">
+      <name :actor="actor"></name>
+    </span>
+  </template>
+  <template id="profile-picture">
+    <magnet-img :src="profile?profile.icon.magnet:anonymous"></magnet-img>
 
-  <template id="pfp">
+    <form v-if="editable" @submit.prevent="savePicture">
+      Choose a profile Picture:
+      <input type="file" accept="image/*" @change="onPicture" />
+      <input type="submit" value="Save" />
+    </form>
+  </template>
+
+  <template id="replies">
+    <form @submit.prevent="postReply">
+      <input v-model="content" />
+      <input type="submit" value="Reply" />
+    </form>
+    <ul>
+      <li v-for="reply in replies" :key="reply.id">
+        <name :actor="reply.actor"></name>:
+        {{ reply.content }}
+      </li>
+    </ul>
+  </template>
+
+
+  <!-- <template id="pfp">
     <div class="profile-picture-container">
       <div class="profile-picture" v-if="imageUrl">
         <img :src="imageUrl" />
@@ -328,7 +362,7 @@
         </div>
       </div>
     </div>
-  </template>
+  </template> -->
 
 
 

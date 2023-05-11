@@ -2,7 +2,6 @@ import * as Vue from "https://unpkg.com/vue@3/dist/vue.esm-browser.js";
 import { mixin } from "https://mavue.mavo.io/mavue.js";
 import GraffitiPlugin from "https://graffiti.garden/graffiti-js/plugins/vue/plugin.js";
 import Resolver from "./resolver.js";
-import axios from "https://cdn.skypack.dev/axios@0.24.0";
 
 const app = {
   // Import MaVue
@@ -11,12 +10,11 @@ const app = {
   // Import resolver
   created() {
     this.resolver = new Resolver(this.$gf);
-    this.populateUsernames();
   },
 
   setup() {
     // Initialize the name of the channel we're chatting in
-    const channel = Vue.ref("default");
+    const channel = Vue.ref("default-demo");
 
     // And a flag for whether or not we're private-messaging
     const pick = Vue.ref("nav-updates");
@@ -24,8 +22,10 @@ const app = {
     // If we're private messaging use "me" as the channel,
     // otherwise use the channel value
     const $gf = Vue.inject("graffiti");
-    const context = Vue.computed(() => {
-      if (pick.value == "nav-private") {
+    const context = Vue.computed(() =>
+    //   privateMessaging.value ? [$gf.me] : [channel.value]
+    // );
+    {if (pick.value == "nav-private") {
         return [$gf.me];
       } else {
         return [channel.value];
@@ -41,7 +41,6 @@ const app = {
     // Initialize some more reactive variables
     return {
       messageText: "",
-      usernames: [],
       editID: "",
       editText: "",
       recipient: "",
@@ -60,11 +59,8 @@ const app = {
       myUsername: "",
       actorsToUsernames: {},
       /////////////////////////////
-      imageDownloads: {},
-      person: {},
-      searchQuery: "",
       pick: "nav-updates",
-      replies: {},
+      searchQuery: "",
     };
   },
 
@@ -88,24 +84,8 @@ const app = {
         }
       }
     },
-
-    async messagesWithAttachments(messages) {
-      for (const m of messages) {
-        if (!(m.attachment.magnet in this.imageDownloads)) {
-          this.imageDownloads[m.attachment.magnet] = "downloading";
-          let blob;
-          try {
-            blob = await this.$gf.media.fetch(m.attachment.magnet);
-          } catch (e) {
-            this.imageDownloads[m.attachment.magnet] = "error";
-            continue;
-          }
-          this.imageDownloads[m.attachment.magnet] = URL.createObjectURL(blob);
-        }
-      }
-    },
   },
-  /////////
+  /////////////////////////////
 
   computed: {
     messages() {
@@ -120,7 +100,7 @@ const app = {
             // Is the value of that property 'Note'?
             m.type == "Note" &&
             // Does the message have a content property?
-            m.content &&
+            (m.content || m.content == "") &&
             // Is that property a string?
             typeof m.content == "string"
         );
@@ -144,11 +124,6 @@ const app = {
           m.content.toLowerCase().includes(this.searchQuery.toLowerCase())
         );
       }
-      if (this.findPeople) {
-        messages = messages.filter((m) =>
-          m.content.toLowerCase().includes(this.findPeople.toLowerCase())
-        );
-      }
 
       return (
         messages
@@ -159,48 +134,15 @@ const app = {
           .slice(0, 50)
       );
     },
-    messagesWithAttachments() {
-      return this.messages.filter(
-        (m) =>
-          m.attachment &&
-          m.attachment.type == "Image" &&
-          typeof m.attachment.magnet == "string"
-      );
-    },
   },
 
   methods: {
-    // async populateUsernames() {
-    //   const result = await axios.get("/api/usernames");
-    //   this.usernames = result.data;
-    // },
-    // async populateUsernames() {
-    //   const result = await axios.get("/api/usernames");
-    //   this.usernames = result.data;
-    // },    
-    async populateUsernames() {
-      try {
-        const response = await axios.get('/api/usernames');
-        this.usernames = response.data;
-      } catch (error) {
-        console.error('Failed to fetch usernames:', error);
-      }
-    },    
-    async populateRecipients() {
-      const result = await axios.get("/api/usernames");
-      this.recipients = result.data;
-    },
-
     async sendMessage() {
       const message = {
         type: "Note",
         content: this.messageText,
       };
 
-      // The context field declares which
-      // channel(s) the object is posted in
-      // You can post in more than one if you want!
-      // The bto field makes messages private
       if (this.file) {
         message.attachment = {
           type: "Image",
@@ -208,6 +150,11 @@ const app = {
         };
         this.file = null;
       }
+
+      // The context field declares which
+      // channel(s) the object is posted in
+      // You can post in more than one if you want!
+      // The bto field makes messages private
       if (this.pick === "nav-private") {
         message.bto = [this.recipient];
         message.context = [this.$gf.me, this.recipient];
@@ -217,6 +164,7 @@ const app = {
 
       // Send!
       this.$gf.post(message);
+      this.messageText = "";
     },
 
     removeMessage(message) {
@@ -242,10 +190,9 @@ const app = {
     // Problem 1 solution
     async setUsername() {
       try {
-        const result = await axios.post("/api/set-username", {
-          username: this.preferredUsername,
-        });
-        this.usernameResult = result.data;
+        this.usernameResult = await this.resolver.requestUsername(
+          this.preferredUsername
+        );
         this.myUsername = this.preferredUsername;
       } catch (e) {
         this.usernameResult = e.toString();
@@ -256,18 +203,13 @@ const app = {
     /////////////////////////////
     // Problem 2 solution
     async chatWithUser() {
-      try {
-        const result = await axios.post("/api/username-to-actor", {
-          username: this.recipientUsernameSearch,
-        });
-        this.recipient = result.data;
-        this.recipientUsername = this.recipientUsernameSearch;
-      } catch (e) {
-        console.error(e);
-      }
+      this.recipient = await this.resolver.usernameToActor(
+        this.recipientUsernameSearch
+      );
+      this.recipientUsername = this.recipientUsernameSearch;
     },
-
     /////////////////////////////
+
     onImageAttachment(event) {
       const file = event.target.files[0];
       this.file = file;
@@ -347,83 +289,6 @@ const Name = {
 
   template: "#name",
 };
-////////////////////profile/
-const ProfilePicture = {
-  props: ["actor", "editable"],
-
-  setup(props) {
-    // Get a collection of all objects associated with the actor
-    const { actor } = Vue.toRefs(props);
-    const $gf = Vue.inject("graffiti");
-
-    // Reactive variable to store the image file
-    const file = Vue.ref(null);
-
-    // Reactive variable to store the image URL
-    const imageUrl = Vue.ref(null);
-
-    // Load the profile picture if it exists
-    const profile = Vue.computed(() => {
-      const objects = $gf.useObjects([actor]).value;
-      const profileObject = objects.find(
-        (obj) =>
-          obj.type === "Profile" && obj.image && typeof obj.image === "string"
-      );
-      if (profileObject) {
-        imageUrl.value = profileObject.image;
-      }
-      return profileObject;
-    });
-
-    // Handle file upload and update the image URL
-    const handleFileUpload = (event) => {
-      file.value = event.target.files[0];
-      imageUrl.value = URL.createObjectURL(file.value);
-    };
-
-    // Save the profile picture
-    const saveProfilePicture = async () => {
-      if (!file.value) {
-        return;
-      }
-      const formData = new FormData();
-      formData.append("file", file.value);
-      const response = await $gf.postImage(formData);
-      const newImageObject = {
-        type: "Image",
-        name: file.value.name,
-        url: response.url,
-      };
-      const profileObject = profile.value || { type: "Profile" };
-      profileObject.image = newImageObject;
-      await $gf.post(profileObject);
-      file.value = null;
-      imageUrl.value = response.url;
-      editing.value = false;
-    };
-
-    // Reactive variable to store the editing state
-    const editing = Vue.ref(false);
-
-    // Enter the editing state and reset the image file
-    const editProfilePicture = () => {
-      editing.value = true;
-      file.value = null;
-    };
-
-    return {
-      file,
-      imageUrl,
-      profile,
-      editing,
-      handleFileUpload,
-      saveProfilePicture,
-      editProfilePicture,
-    };
-  },
-
-  template: "#pfp",
-};
 
 const Like = {
   props: ["messageid"],
@@ -468,48 +333,111 @@ const Like = {
 
   template: "#like",
 };
-const Read = {
-  props: ["messageid"],
+
+const MagnetImg = {
+  props: {
+    src: String,
+    loading: {
+      type: String,
+      default:
+        "https://upload.wikimedia.org/wikipedia/commons/9/92/Loading_icon_cropped.gif",
+    },
+    error: {
+      type: String,
+      default: "", // empty string will trigger broken link
+    },
+  },
+
+  data() {
+    return {
+      fetchedSrc: "",
+    };
+  },
+
+  watch: {
+    src: {
+      async handler(src) {
+        this.fetchedSrc = this.loading;
+        try {
+          this.fetchedSrc = await this.$gf.media.fetchURL(src);
+        } catch {
+          this.fetchedSrc = this.error;
+        }
+      },
+      immediate: true,
+    },
+  },
+
+  template: '<img :src="fetchedSrc" style="max-width: 8rem" />',
+};
+
+const ProfilePicture = {
+  props: {
+    actor: {
+      type: String,
+    },
+    editable: {
+      type: Boolean,
+      default: false,
+    },
+    anonymous: {
+      type: String,
+      default:
+        "magnet:?xt=urn:btih:58c03e56171ecbe97f865ae9327c79ab3c1d5f16&dn=Anonymous.svg&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com",
+    },
+  },
 
   setup(props) {
+    // Get a collection of all objects associated with the actor
+    const { actor } = Vue.toRefs(props);
     const $gf = Vue.inject("graffiti");
-    const messageid = Vue.toRef(props, "messageid");
-    const { objects: readsRaw } = $gf.useObjects([messageid]);
-    return { readsRaw };
+    return $gf.useObjects([actor]);
   },
 
   computed: {
-    reads() {
-      return this.readsRaw.filter(
-        (l) => l.type == "Read" && l.object == this.messageid
-      );
+    profile() {
+      return this.objects
+        .filter(
+          (m) =>
+            m.type == "Profile" &&
+            m.icon &&
+            m.icon.type == "Image" &&
+            typeof m.icon.magnet == "string"
+        )
+        .reduce(
+          (prev, curr) =>
+            !prev || curr.published > prev.published ? curr : prev,
+          null
+        );
     },
+  },
 
-    numReads() {
-      // Unique number of actors
-      return [...new Set(this.reads.map((l) => l.actor))].length;
-    },
-
-    myReads() {
-      return this.reads.filter((l) => l.actor == this.$gf.me);
-    },
+  data() {
+    return {
+      file: null,
+    };
   },
 
   methods: {
-    toggleRead() {
-      if (this.myReads.length) {
-        this.$gf.remove(...this.myReads);
-      } else {
-        this.$gf.post({
-          type: "Read",
-          object: this.messageid,
-          context: [this.messageid],
-        });
-      }
+    async savePicture() {
+      if (!this.file) return;
+
+      this.$gf.post({
+        type: "Profile",
+        icon: {
+          type: "Image",
+          magnet: await this.$gf.media.store(this.file),
+        },
+      });
+    },
+
+    onPicture(event) {
+      const file = event.target.files[0];
+      this.file = file;
     },
   },
 
-  template: "#read",
+  template: "#profile-picture",
 };
 
 const Replies = {
@@ -605,8 +533,6 @@ const ReadReceipts = {
   template: "#read-receipts",
 };
 
-app.components = { Name, Like, ProfilePicture, Read };
-Vue.createApp(app).use(GraffitiPlugin(Vue)).mount("#app");
 Vue.createApp(app)
   .component("name", Name)
   .component("like", Like)
