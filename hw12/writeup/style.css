@@ -460,8 +460,8 @@ body {
   }
   
   ul {
-    list-style-type: none;
-    padding: 0;
+    /* list-style-type: none; */
+    padding-left: 20px;
     margin-top: 20px;
     border: 2px solid #eee; /* Adds a light gray border around the list */
     border-radius: 10px; /* Rounds the corners of the border */

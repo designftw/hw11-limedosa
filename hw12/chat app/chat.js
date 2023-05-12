@@ -88,6 +88,10 @@ const app = {
   /////////////////////////////
 
   computed: {
+    usernames() {
+      const users = this.resolver.users();
+      return users.map(user => user.username);
+    },
     messages() {
       let messages = this.messagesRaw
         // Filter the "raw" messages for data
@@ -131,7 +135,7 @@ const app = {
           // most recently created ones first
           .sort((m1, m2) => new Date(m2.published) - new Date(m1.published))
           // Only show the 10 most recent ones
-          .slice(0, 50)
+          .slice(0, 10)
       );
     },
   },
