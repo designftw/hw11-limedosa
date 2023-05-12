@@ -226,9 +226,10 @@ h3 {
 
 .nav {
   /* outline: red dashed 1px; */
+  padding-left: .1px;
   position: fixed;
   bottom: 0;
-  width: 69%;
+  width: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -341,9 +342,9 @@ input[type="radio"]:checked + label {
 
 /* Style for the chat app container */
 #app {
-  margin-top: 8% !important;
+  margin-top: 4% !important;
   margin: 8% auto;
-  max-width: 70%;
+  max-width: 50%;
   padding: 10px;
   background-color: #4c624c72;
   border-radius: 10px;
