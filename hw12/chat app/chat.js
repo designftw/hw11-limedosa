@@ -23,14 +23,16 @@ const app = {
     // otherwise use the channel value
     const $gf = Vue.inject("graffiti");
     const context = Vue.computed(() =>
-    //   privateMessaging.value ? [$gf.me] : [channel.value]
-    // );
-    {if (pick.value == "nav-private") {
-        return [$gf.me];
-      } else {
-        return [channel.value];
+      //   privateMessaging.value ? [$gf.me] : [channel.value]
+      // );
+      {
+        if (pick.value == "nav-private") {
+          return [$gf.me];
+        } else {
+          return [channel.value];
+        }
       }
-    });
+    );
 
     // Initialize the collection of messages associated with the context
     const { objects: messagesRaw } = $gf.useObjects(context);
@@ -40,6 +42,9 @@ const app = {
   data() {
     // Initialize some more reactive variables
     return {
+      friendUsername:"",
+      usernames: [],
+      isHidden: true,
       messageText: "",
       editID: "",
       editText: "",
@@ -88,9 +93,26 @@ const app = {
   /////////////////////////////
 
   computed: {
+    filteredUsernames() {
+      const query = this.searchQuery.toLowerCase();
+      return this.usernames.filter((username) =>
+        username.toLowerCase().includes(query)
+      );
+    },
+    uniqueActors() {
+      const uniqueSet = new Set();
+      return this.messages.reduce((uniqueActors, message) => {
+        const actor = message.actor;
+        if (!uniqueSet.has(actor)) {
+          uniqueSet.add(actor);
+          uniqueActors.push(actor);
+        }
+        return uniqueActors;
+      }, []);
+    },
     usernames() {
       const users = this.resolver.users();
-      return users.map(user => user.username);
+      return users.map((user) => user.username);
     },
     messages() {
       let messages = this.messagesRaw
@@ -135,12 +157,29 @@ const app = {
           // most recently created ones first
           .sort((m1, m2) => new Date(m2.published) - new Date(m1.published))
           // Only show the 10 most recent ones
-          .slice(0, 10)
+          .slice(0)
       );
     },
   },
 
   methods: {
+    async addFriend(){
+      try{
+        const friendActor = await this.resolver.usernameToActor(this.friendUsername);
+        if (friendActor !== this.$gf.me) {
+          this.$gf.post({
+            type: "Follow",
+            actor: this.$gf.me,
+            object: friendActor,
+          });
+          this.friendUsername = ""; // Clear the input field after adding a friend
+        } else {
+          console.error("Cannot add yourself as a friend.");
+        }
+      } catch (error) {
+        console.error("Failed to add friend:", error);
+      }
+      },
     async sendMessage() {
       const message = {
         type: "Note",
@@ -372,7 +411,7 @@ const MagnetImg = {
     },
   },
 
-  template: '<img :src="fetchedSrc" style="max-width: 8rem" />',
+  template: '<img :src="fetchedSrc" style="max-width: 4rem" />',
 };
 
 const ProfilePicture = {

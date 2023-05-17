@@ -21,16 +21,49 @@ body {
     background: linear-gradient(to right, #7ed95784, #85de7780);
   }
 }
-.message-pfp img {
-    width: 40%;
-    height: 40%;
-    border-radius: 50%;
-    overflow: hidden;
-    border: 5px solid rgb(69, 147, 90);
-  }
-  
+/* .message-pfp img { */
+/* max-width: 40%;
+  max-height: 40%;
+  border-radius: 50%; */
+/* border-radius: 50%; */
+/* position: relative;
+  width: 200px;
+  height: 200px;
+  overflow: hidden;
+  border-radius: 50%;
 
-  
+  border: 5px solid rgb(69, 147, 90);
+} */
+/* .message-pfp {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  overflow: hidden;
+  border-radius: 50%;
+}
+
+.message-pfp img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 50%;
+} */
+.message-pfp {
+  /* position: relative; */
+  width: 100px; /* Change the width to your desired size */
+  height: 100px; /* Change the height to your desired size */
+  overflow: hidden;
+  border-radius: 50%;
+}
+
+.message-pfp img {
+  width: 50%;
+  height: 50%;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 50%;
+}
 
 .message-actor {
   font-size: 19px !important;
@@ -209,7 +242,7 @@ input[type="radio"] {
   width: 100%;
   text-align: center;
   padding: 1px 0;
-  background-color: #fff;
+  background-color: #ffffffc9;
   z-index: 100;
   /* bottom: 100px !important;  */
 }
@@ -226,7 +259,7 @@ h3 {
 
 .nav {
   /* outline: red dashed 1px; */
-  padding-left: .1px;
+  padding-left: 1px;
   position: fixed;
   bottom: 0;
   width: 50%;
