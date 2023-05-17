@@ -1,5 +1,5 @@
 body {
-  background: linear-gradient(to right, #7ed957, #85de77);
+  background: linear-gradient(to right, #151b1362, #182b1575);
   font-family: Arial, sans-serif;
   animation: background-animation 3s ease-in-out infinite alternate;
 }
@@ -12,13 +12,13 @@ body {
 /* Animation for the background gradient */
 @keyframes background-animation {
   0% {
-    background: linear-gradient(to right, #7ed957b0, #85de779f);
+    background: linear-gradient(to right, #161616eb, #1a1b1aa4);
   }
   50% {
-    background: linear-gradient(to right, #7ed9577b, #85de7784);
+    background: linear-gradient(to right, #1a1b1aeb, #181818a4);
   }
   100% {
-    background: linear-gradient(to right, #7ed95784, #85de7780);
+    background: linear-gradient(to right, #151615eb, #181918a4);
   }
 }
 /* .message-pfp img { */
