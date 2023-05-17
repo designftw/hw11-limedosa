@@ -4,6 +4,7 @@ import GraffitiPlugin from "https://graffiti.garden/graffiti-js/plugins/vue/plug
 import Resolver from "./resolver.js";
 
 const app = {
+  
   // Import MaVue
   mixins: [mixin],
 
@@ -42,6 +43,8 @@ const app = {
   data() {
     // Initialize some more reactive variables
     return {
+      showForm: true,
+      messageText: '',
       friendUsername:"",
       usernames: [],
       isHidden: true,
@@ -163,6 +166,9 @@ const app = {
   },
 
   methods: {
+    toggleForm() {
+      this.showForm = !this.showForm;
+    },
     async addFriend(){
       try{
         const friendActor = await this.resolver.usernameToActor(this.friendUsername);

@@ -88,15 +88,21 @@
         <!-- End problem 2 solution -->
 
         <!-- A form for sending messages -->
-        <h3 style="text-align: left;">New Message:</h3>
-        <form @submit.prevent="sendMessage">
 
-          <input v-model="messageText" placeholder="Type a message..." style="font-size: 20px;" />
-          <br>
-          <input type="file" accept="image/*" @change="onImageAttachment" style="font-size: 20px;" />
-          <br> <br>
-          <input type="submit" value="Send" style="font-size: 20px;" />
+        <div class="toggle">
+          <input type="checkbox" id="toggle-checkbox" class="toggle-checkbox" @change="toggleForm">
+          <label for="toggle-checkbox" class="toggle-label"> +</label>
+        </div>
+        
+        <form v-if="showForm" @submit.prevent="sendMessage">
+          <h3 style="padding-bottom:2%; ">New Post</h3><br> <br> <p></p>
+          <input v-model="messageText" placeholder="Type a message..." />
+          <input type="file" accept="image/*" @change="onImageAttachment" />
+          <input type="submit" value="Post" />
         </form>
+
+
+
         <form class="search">
           <input type="text" placeholder="🔎" class="search__input" v-model="searchQuery">
           <button type="button" class="search__btn"><i class="ri-search-2-line"></i></button>
@@ -136,7 +142,7 @@
                 {{ message.actor }}
               </li> -->
 
-              <!-- <template v-if="privateMessaging">
+              <template v-if="privateMessaging">
                           <li>
                             To Name: <name :actor="message.bto[0]"></name>
                           </li>
@@ -146,17 +152,13 @@
                           <li>
                             To Username: {{ actorsToUsernames[message.bto[0]] }}
                           </li>
-                        </template> -->
+                        </template>
               <li class="message-date">
-                Published: {{ message.published }}
+                {{ message.published }} Last Edited: {{ message.updated }}
               </li>
-              <li class="message-date">
-                Last Edited: {{ message.updated }}
-              </li>
-              <!-- <li class="popup"> -->
-              <!-- This is a unique identifier that can be used to "link" to messages -->
-              <!-- ID: {{ message.id }} -->
-              <!-- </li> -->
+              <!-- <li class="message-date">
+                
+              </li> -->
 
               <li v-if="message.attachment && message.attachment.magnet">
                 <magnet-img :src="message.attachment.magnet"></magnet-img>
@@ -167,12 +169,12 @@
               <template v-if="message.actor==$gf.me">
                 <li>
                   <button @click="removeMessage(message)">
-                    Delete Message
+                    🗑️
                   </button>
                 </li>
                 <li>
                   <button @click="startEditMessage(message)">
-                    Edit Message
+                    🖋️
                   </button>
                 </li>
               </template>
@@ -257,9 +259,10 @@
         <p>
         <h3>Select Recipient:</h3>
         <form @submit.prevent="chatWithUser">
-          <label for="recipient">
-            Chat with:
-          </label>
+          <label for="recipient" style="color: white; padding: 50px; font-size:large;">
+            Chat
+            with:</label>
+
           <input id="recipient" v-model="recipientUsernameSearch" />
           <input type="submit" value="Search" />
         </form>
@@ -329,7 +332,7 @@
     </form>
   </template>
 
-  <template id="replies">
+  <!-- <template id="replies">
     <form @submit.prevent="postReply">
       <input v-model="content" />
       <input type="submit" value="Reply" />
@@ -340,7 +343,23 @@
         {{ reply.content }}
       </li>
     </ul>
+  </template> -->
+  <template id="replies">
+    <form @submit.prevent="postReply">
+      <input v-model="content" />
+      <input type="submit" value="Reply" />
+    </form>
+    <ul>
+      <li v-for="reply in replies" :key="reply.id">
+        <name :actor="reply.actor"></name>:
+        {{ reply.content }}
+        <template v-if="reply.replies.length > 0">
+          <replies :replies="reply.replies"></replies>
+        </template>
+      </li>
+    </ul>
   </template>
+
 
   <template id="read-receipts">
     :
