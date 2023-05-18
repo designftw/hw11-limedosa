@@ -13,7 +13,7 @@
     </h1>
 
     <!-- Begin problem 3 solution -->
-    <h2>
+    <h2 style="text-align:right; padding-top:10%;font-size: 100% !important;">
       {{myUsername}}
     </h2>
     <!-- End problem 3 solution -->
@@ -86,14 +86,11 @@
         <h2 class="nav-heading">Updates</h2>
 
         <!-- End problem 2 solution -->
-
-        <!-- A form for sending messages -->
         <form class="search">
           <input type="text" placeholder="🔎 Search Posts 🔎" class="search__input" v-model="searchQuery">
           <button type="button" class="search__btn"><i class="ri-search-2-line"></i></button>
         </form>
-        
-        
+        <!-- A form for sending messages -->
         <input type="checkbox" id="toggle-checkbox" class="toggle-checkbox" style="text-align:right;">
         <label for="toggle-checkbox" class="toggle-label"></label>
         
@@ -103,13 +100,14 @@
           <input type="file" accept="image/*" @change="onImageAttachment" />
           <input type="submit" value="Post" />
         </form>
+
+
         <ul>
           <ul>
-            
-            <li v-for="username in usernames" :key="username">{{ username }}f3rfr</li>
+            <li v-for="username in usernames" :key="username">{{ username }}</li>
           </ul>
-
-          <h3>All Updates</h3> 
+          
+          <h3>All Updates</h3>
           <!-- List all the messages -->
           <li v-for="message of messages" :key="message.id">
 
@@ -121,16 +119,18 @@
 
             <!-- Otherwise, display a bunch of properties from the message -->
             <ul v-else>
-              <li class="message-username">
+              <!-- <li class="message-username">
                 {{ actorsToUsernames[message.actor] }}
-              </li>
+              </li> -->
 
               <li class="message-actor">
-                <name :actor="message.actor"></name>
+                <h4 class="message-username"><name :actor="message.actor"></name></h4>
+                <h4 class="message-pfp"><profile-picture :actor="message.actor"></profile-picture></h4>
+                <h4 class="message-username"> {{ actorsToUsernames[message.actor] }}</h4>
               </li>
-              <li class="message-pfp">
+              <!-- <li class="message-pfp">
                 <profile-picture :actor="message.actor"></profile-picture>
-              </li>
+              </li> -->
               <li class="message-content">
                 {{ message.content }}
               </li>
@@ -138,7 +138,7 @@
                 {{ message.actor }}
               </li> -->
 
-              <template v-if="privateMessaging">
+              <template v-if="nav-private">
                           <li>
                             To Name: <name :actor="message.bto[0]"></name>
                           </li>
@@ -150,10 +150,14 @@
                           </li>
                         </template>
               <li class="message-date">
-                {{ message.published }} Last Edited: {{ message.updated }}
+                {{ message.published }}
               </li>
               <!-- <li class="message-date">
-                
+                {{ message.updated }}
+              </li> -->
+              <!-- <li class="popup"> -->
+                <!-- This is a unique identifier that can be used to "link" to messages -->
+                <!-- ID: {{ message.id }}
               </li> -->
 
               <li v-if="message.attachment && message.attachment.magnet">
@@ -165,12 +169,12 @@
               <template v-if="message.actor==$gf.me">
                 <li>
                   <button @click="removeMessage(message)">
-                    🗑️
+                    Delete Message
                   </button>
                 </li>
                 <li>
                   <button @click="startEditMessage(message)">
-                    🖋️
+                    Edit Message
                   </button>
                 </li>
               </template>
@@ -194,53 +198,6 @@
         <h2 class="nav-heading"> Video Chat</h2>
         <h1>UNDER CONSTRUCTION</h1>
       </template>
-      <template v-if="pick==='nav-search'">
-
-        <h2 class="nav-heading"> Find Friends</h2>
-        <input v-model="friendUsername" placeholder="Enter friend's username" />
-        <button @click="addFriend">Add</button>
-        <div class="chat-messages" ref="chatMessages">
-          <div class="message" v-for="(uniqueActor, index) in uniqueActors" :key="index">
-            <span class="message-pfp"><profile-picture :actor="uniqueActor"></profile-picture></span>
-            <span class="message-username">{{ actorsToUsernames[uniqueActor] }}</span>
-            <span class="message-name">
-              <name :actor="uniqueActor"></name>
-            </span>
-          </div>
-        </div>
-
-
-        <!-- <button @click="toggleChat">X</button> -->
-        <!-- </div> -->
-        <!-- <div class="chat-messages" ref="chatMessages">
-
-    <div class="message" v-for="message in messages" :key="message.id">
-      <span class="message-pfp"><profile-picture :actor="message.actor"></profile-picture></span>
-      <span class="message-username"> {{ actorsToUsernames[message.actor] }} </span>
-      <span class="message-name">
-        <name :actor="message.actor"></name>
-      </span>
-
-
-    </div>
-
-  </div> -->
-        <!-- <template>
-          <div>
-            <h1>List of Usernames</h1>
-            <ul>
-              <li v-for="username in usernames" :key="username">{{ username }}</li>
-            </ul>
-          </div>
-        </template>  -->
-
-
-        <form class="search">
-          <input type="text" placeholder="🔎" class="search__input" v-model="searchQuery">
-          <button type="button" class="search__btn"><i class="ri-search-2-line"></i></button>
-        </form>
-
-      </template>
 
       <!-- <p v-if="!privateMessaging">
                 <label for="channel">
@@ -255,10 +212,9 @@
         <p>
         <h3>Select Recipient:</h3>
         <form @submit.prevent="chatWithUser">
-          <label for="recipient" style="color: white; padding: 50px; font-size:large;">
-            Chat
-            with:</label>
-
+          <label for="recipient">
+            Chat with:
+          </label>
           <input id="recipient" v-model="recipientUsernameSearch" />
           <input type="submit" value="Search" />
         </form>
@@ -270,7 +226,6 @@
         </span>
         <form @submit.prevent="sendMessage">
           <input v-model="messageText" placeholder="Type a message..." />
-          <!-- <input type="file" accept="image/*" @change="onImageAttachment" placeholder="hereeeeee Select an image file" /> -->
           <input type="file" accept="image/*" @change="onImageAttachment" />
           <input type="submit" value="Send" />
         </form>
@@ -285,7 +240,14 @@
     </template>
   </div>
 
-
+  <template v-if="pick==='nav-search'">
+    <h2 class="nav-heading">Private Messages</h2>
+    <h1>UNDER CONSTRUCTION</h1>
+    <form class="search">
+      <input type="text" placeholder="🔎" class="search__input" v-model="searchQuery">
+      <button type="button" class="search__btn"><i class="ri-search-2-line"></i></button>
+    </form>
+  </template>
 
 
 
@@ -328,18 +290,6 @@
     </form>
   </template>
 
-  <!-- <template id="replies">
-    <form @submit.prevent="postReply">
-      <input v-model="content" />
-      <input type="submit" value="Reply" />
-    </form>
-    <ul>
-      <li v-for="reply in replies" :key="reply.id">
-        <name :actor="reply.actor"></name>:
-        {{ reply.content }}
-      </li>
-    </ul>
-  </template> -->
   <template id="replies">
     <form @submit.prevent="postReply">
       <input v-model="content" />
@@ -349,16 +299,12 @@
       <li v-for="reply in replies" :key="reply.id">
         <name :actor="reply.actor"></name>:
         {{ reply.content }}
-        <template v-if="reply.replies.length > 0">
-          <replies :replies="reply.replies"></replies>
-        </template>
       </li>
     </ul>
   </template>
 
-
   <template id="read-receipts">
-    :
+    Read:
     <span v-for="actor in readActors">
       <name :actor="actor"></name>,
     </span>

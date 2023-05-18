@@ -93,7 +93,7 @@ body {
   font-size: 19px !important;
   text-align: center;
   /* font-weight: bold; */
-  font-weight: bolder;
+  /* font-weight: bolder; */
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   color: #011a80 !important;
   /* padding: 10%; */
@@ -573,6 +573,7 @@ li:not(:first-child) {
   font-weight: bold;
   font-size: 20px;
   color: #333;
+
 }
 
 /* Style for the delete and edit buttons */
@@ -640,7 +641,7 @@ p {
   display: block;
   width: 80px;
   height: 38px;
-  background-color: #d6e0e7d1;
+  background-color: #d6e0e7d1 ;
   border-radius: 40px;
   text-align: center;
   line-height: 38px;
