@@ -1,7 +1,7 @@
 body {
-  background: linear-gradient(to right, #395B64, #2a3434);
+  background: linear-gradient(to right, #395b64, #2a3434);
   font-family: Arial, sans-serif;
-  color:#395B64;
+  color: #395b64;
   font-size: 100%;
   /* font-weight: bolder; */
   animation: background-animation 10s ease-in-out infinite alternate;
@@ -15,13 +15,36 @@ body {
 /* Animation for the background gradient */
 @keyframes background-animation {
   0% {
-    background: radical-gradient(to right, #2c3333, #395B64, #507A70, #395B64, #2c3333);
+    background: radical-gradient(
+      to right,
+      #2c3333,
+      #395b64,
+      #507a70,
+      #395b64,
+      #2c3333
+    );
   }
   50% {
-    background: radical-gradient(to right, #2c3333, #395B64, #507A70, #395B64, #2c3333);
+    background: radical-gradient(
+      to right,
+      #2c3333,
+      #395b64,
+      #507a70,
+      #395b64,
+      #2c3333
+    );
   }
   100% {
-    background: radical-gradient(to right, #2c3333, #395B64, #507A70, #68997D, #81A88B, #395B64, #2c3333);
+    background: radical-gradient(
+      to right,
+      #2c3333,
+      #395b64,
+      #507a70,
+      #68997d,
+      #81a88b,
+      #395b64,
+      #2c3333
+    );
   }
 }
 
@@ -40,7 +63,7 @@ body {
   object-fit: cover;
   object-position: center;
   border-radius: 50%;
-  border: 2px solid #2C3333;
+  border: 2px solid #2c3333;
 }
 
 .message-actor {
@@ -126,7 +149,7 @@ form input[type="submit"] {
   color: white;
   padding: 7px 14px;
   text-align: center;
-  display:flexbox;
+  display: flexbox;
   font-size: 14px;
   margin: 4px 2px;
   transition: 400ms;
@@ -141,7 +164,6 @@ form input[type="submit"] {
   cursor: pointer;
   margin-left: 1rem;
 }
-
 
 form input[type="submit"]:hover {
   background-color: #000599;
@@ -213,7 +235,7 @@ input[type="radio"] {
   display: none;
 }
 .app-name {
-  color: #A5C9CA;
+  color: #a5c9ca;
   position: fixed;
   top: -4%;
   left: 50%;
@@ -221,12 +243,12 @@ input[type="radio"] {
   width: 51.4%;
   text-align: center;
   /* padding: .01px 0; */
-  background-color: #E7F6F2;
+  background-color: #e7f6f2;
   z-index: 100;
   /* bottom: 100px !important;  */
 }
 h3 {
-  color: #E7F6F2;
+  color: #e7f6f2;
   font-size: 20px;
   font-weight: bold;
   text-align: center;
@@ -246,11 +268,9 @@ h3 {
   padding: 7px 0;
   background-color: #374040;
   bottom: -15px !important;
-
 }
 
 .nav label {
-
   flex: 1;
   display: flex;
   justify-content: space-around;
@@ -258,7 +278,7 @@ h3 {
   margin: 0 5px;
   cursor: pointer;
   font-size: 26px !important;
-  color: #E7F6F2 !important;
+  color: #e7f6f2 !important;
   border-radius: 10px !important;
   padding: 3px !important;
 }
@@ -269,7 +289,7 @@ h3 {
 
 .nav input[type="radio"]:checked + label {
   background-color: #fff !important;
-  color: #395B64 !important;
+  color: #395b64 !important;
 }
 
 label:hover {
@@ -359,7 +379,7 @@ input[type="radio"]:checked + label {
   margin: 8% auto;
   max-width: 50%;
   padding: 14px;
-  background-color: #2C3333;
+  background-color: #2c3333;
   border-radius: 10px;
   box-shadow: 0 0 60px #4c7a87;
   word-wrap: break-word;
@@ -375,7 +395,7 @@ h2 {
   line-height: 1.2;
   font-size: 94px;
   text-align: center;
-  color: #A5C9CA;
+  color: #a5c9ca;
 }
 
 h1 {
@@ -389,7 +409,7 @@ h1 {
   /* font-size: 9px; */
   text-align: center;
   /* margin-bottom: 10px; */
-  color: #A5C9CA;
+  color: #a5c9ca;
   text-shadow: 60px #315621 !important;
   border-radius: 4px;
   -webkit-text-stroke: px #7ed957 !important;
@@ -480,13 +500,13 @@ ul {
   padding: 0;
   /* margin-top: 20px; */
   border: 2px solid #eee; /* Adds a light gray border around the list */
-  border-radius: .1px; 
+  border-radius: 0.1px;
   font-family: Arial, sans-serif; /* Sets the font for the list */
   /* padding: 10px; Adds padding to each list item */
   margin-bottom: 5px; /* Adds margin between each list item */
   background-color: #dbe5ed91; /* Sets a light gray background color for each list item */
   border-radius: 5px; /* Rounds the corners of each list item */
-  box-shadow: 1px 6px 2px #395B64; /* Adds a subtle box shadow to each list item */
+  box-shadow: 1px 6px 2px #395b64; /* Adds a subtle box shadow to each list item */
 }
 label {
   display: block;
@@ -545,7 +565,6 @@ label {
   margin: 0.4rem 0;
 }
 
-
 /* Style for the message properties */
 li:not(:first-child) {
   font-size: 15px;
@@ -560,7 +579,7 @@ li:not(:first-child) {
 li button {
   font-size: 14px;
   color: #fff;
-  background-color: #395B64;
+  background-color: #395b64;
   border: none;
   border-radius: 4px;
   padding: 5px 10px;
@@ -602,46 +621,49 @@ li:hover .popup-id {
   color: #333;
   font-weight: bold;
 }
-.toggle {
-  left:24em;
-  display: inline-block;
-  width: 80px;
-  height: 38px;
-  background-color: #d6e0e7d1;
-  border-radius: 40px;
-  position: relative;
-  overflow: hidden;
-}
-/* 
-.toggle input[type="checkbox"] {
-  display: none;
-} */
 
-.toggle-label {
-  display: block;
-  overflow: hidden;
-  cursor: pointer;
-  border-radius: 34px;
-}
-
-.toggle-label:before {
-  content: "";
-  display: block;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(158, 181, 204, 0.894);
-  border-radius: 34px;
-  position: absolute;
-  top: 0;
-  left: 0;
-  transition: all 0.25s ease-in-out;
-}
-
-.toggle-checkbox:checked + .toggle-label:before {
-  transform: translateX(50px);
-}
-p{
+p {
   font-size: 20px;
   color: #f8f8f8 !important;
   font-weight: bold;
 }
+
+.toggle-checkbox {
+  display: none;
+}
+
+.toggle-label {
+  position: absolute;
+  right: 25%;
+  top: 28%;
+  content: "+";
+  display: block;
+  width: 80px;
+  height: 38px;
+  background-color: #d6e0e7d1;
+  border-radius: 40px;
+  text-align: center;
+  line-height: 38px;
+  transition: all 0.25s ease-in-out;
+  cursor: pointer;
+  font-size: 24px; /* Adjust the font size as needed */
+}
+
+.toggle-checkbox:checked + .toggle-label:before {
+  content: "-";
+  transform: translateX(42px);
+}
+
+.toggle-checkbox:not(:checked) + .toggle-label:before {
+  content: "+";
+  transform: none;
+}
+
+form {
+  display: none;
+}
+
+.toggle-checkbox:checked + .toggle-label + form {
+  display: block;
+}
+
